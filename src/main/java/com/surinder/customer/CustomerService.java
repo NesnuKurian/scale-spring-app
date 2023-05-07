@@ -1,5 +1,6 @@
 package com.surinder.customer;
 
+import com.surinder.exception.ResourceNotFound;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class CustomerService {
 
     public Customer getCustomer(Integer id) {
         return customerDao.selectCustomerById(id)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new ResourceNotFound(
                         "customer with id [%s] not found".formatted(id)
                 ));
     }
