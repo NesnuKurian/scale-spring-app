@@ -16,9 +16,9 @@ public class Main {
         ConfigurableApplicationContext applicationContext = SpringApplication.run(Main.class, args);
 
         // you can find beans with the following code, predefined or which are already there in the springboot
-        String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
+        /*String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
         for (String beanDefinitionName : beanDefinitionNames) {
             System.out.println(beanDefinitionName);
-        }
+        }*/
     }
 }
