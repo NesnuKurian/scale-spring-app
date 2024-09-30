@@ -4,7 +4,7 @@ pipeline {
     environment {
         AWS_REGION = ca-central-1'
         ECR_REPOSITORY = 'scale-spring-app'
-        GITHUB_REPO = 'https://github.com/Surinder07/scale-spring-app.git'
+        GITHUB_REPO = 'https://github.com/NesnuKurian/scale-spring-app.git'
     }
 
     stages {
