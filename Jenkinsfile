@@ -14,13 +14,12 @@ pipeline {
             }
         }
         stage('Build Jar') {
-    steps {
-        script {
-            sh 'mvn clean package'
+            steps {
+                script {
+                    sh 'mvn clean package'
         }
     }
 }
-
 
      stage('Build Docker Image') {
             steps {
