@@ -14,4 +14,12 @@ pipeline {
             }
         }
 }
+     stage('Build Docker Image') {
+            steps {
+                // Build the Docker image
+                script {
+                    sh 'docker build -t scale-spring-app .'
+                }
+            }
+        }
 }
