@@ -13,7 +13,7 @@ pipeline {
                 git branch: 'main', url: "${GITHUB_REPO}"
             }
         }
-}
+
      stage('Build Docker Image') {
             steps {
                 // Build the Docker image
@@ -22,4 +22,4 @@ pipeline {
                 }
             }
         }
-}
+}}
