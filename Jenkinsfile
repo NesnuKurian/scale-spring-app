@@ -13,6 +13,14 @@ pipeline {
                 git branch: 'main', url: "${GITHUB_REPO}"
             }
         }
+        stage('Build Jar') {
+    steps {
+        script {
+            sh 'mvn clean package'
+        }
+    }
+}
+
 
      stage('Build Docker Image') {
             steps {
