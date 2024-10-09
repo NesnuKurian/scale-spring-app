@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scale-spring-app-deployment  # Name of your deployment
+  labels:
+    app: scale-spring-app            # Label to identify your app
+spec:
+  replicas: 2                      # Number of pods to run (can be increased/decreased)
+  selector:
+    matchLabels:
+      app: scale-spring-app
+  template:
+    metadata:
+      labels:
+        app: scale-spring-app
+    spec:
+      containers:
+        - name: scale-spring-app
+          image: nesnukurian/scale-spring-app:latest  # Docker image from Docker Hub
+          ports:
+            - containerPort: 8081  # Port on which the Spring Boot app runs
