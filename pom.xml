@@ -37,5 +37,17 @@
 			</plugin>
 		</plugins>
 	</build>
+	<distributionManagement>
+        <repository>
+            <id>maven-releases</id> 
+            
+            <url>http://3.99.190.77:8082/repository/maven-nexus-repo/</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven-snapshots</id> 
+            
+            <url>http://3.99.190.77:8082/repository/maven-nexus-repo-snapshots/</url> 
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
