@@ -1,0 +1,13 @@
+name: Spring-Scale-app
+on: push
+jobs: 
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repository
+        uses: GuillaumeFalourd/clone-github-repo-action@v2.1
+        with:
+          depth: 1
+          branch: 'main'
+          owner: 'nesnukurian'
+          repository: 'scale-spring-app'
