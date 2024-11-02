@@ -1,7 +1,7 @@
 name: Spring-Scale-app
 on: push
 jobs: 
-  build:
+  clone:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Repository
@@ -11,3 +11,34 @@ jobs:
           branch: 'main'
           owner: 'nesnukurian'
           repository: 'scale-spring-app'
+  
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+
+    - name: Build the application with Maven
+      run: |
+        mvn clean package -DskipTests
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and Push Docker image
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ./Dockerfile 
+        push: true
+        tags: nesnukurian/scale-spring-app:latest
