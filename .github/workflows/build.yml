@@ -42,3 +42,36 @@ jobs:
         file: ./Dockerfile 
         push: true
         tags: nesnukurian/scale-spring-app-new:latest
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # Ensure the build job is completed before deploying
+
+    steps:
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # Change to your desired region
+
+      - name: Deploy to EC2
+        run: |
+          # Create the EC2 instance if it doesn't exist
+          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=SpringBootApp" --query "Reservations[*].Instances[*].InstanceId" --output text)
+
+          if [ "$INSTANCE_ID" == "None" ]; then
+            echo "Creating new EC2 instance..."
+            INSTANCE_ID=$(aws ec2 run-instances --image-id ami-0c55b159cbfafe1f0 --count 1 --instance-type t2.micro --key-name your-key-pair --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SpringBootApp}]' --query "Instances[0].InstanceId" --output text)
+            echo "EC2 Instance created: $INSTANCE_ID"
+          else
+            echo "Using existing EC2 instance: $INSTANCE_ID"
+          fi
+
+          # Wait for the instance to be running
+          aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+
+          # Install Docker and run the container
+          aws ec2-instance-connect send-ssh-public-key --instance-id $INSTANCE_ID --instance-os-user ec2-user --ssh-public-key file://~/.ssh/id_rsa.pub
+
+          # Install Docker and run the application
+          aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=instanceids,Values=$INSTANCE_ID" --parameters 'commands=["sudo yum update -y", "sudo amazon-linux-extras install docker -y", "sudo service docker start", "sudo docker pull nesnukurian/scale-spring-app-new:latest", "sudo docker run -d -p 8080:8080 nesnukurian/scale-spring-app-new:latest"]' --comment "Deploying Spring Boot App"
