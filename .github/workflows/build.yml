@@ -69,7 +69,7 @@ jobs:
           # Check if an instance ID was found
           if [ -z "$INSTANCE_ID" ]; then
             echo "No running instance found, creating a new EC2 instance..."
-            INSTANCE_ID=$(aws ec2 run-instances --image-id ami-0c55b159cbfafe1f0 --count 1 --instance-type t2.micro --key-name your-key-pair --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SpringBootApp}]' --query "Instances[0].InstanceId" --output text)
+            INSTANCE_ID=$(aws ec2 run-instances --image-id ami-0c6d358ee9e264ff1 --count 1 --instance-type t2.micro --key-name your-key-pair --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SpringBootApp}]' --query "Instances[0].InstanceId" --output text)
             echo "EC2 Instance created: $INSTANCE_ID"
           else
             echo "Using existing EC2 instance: $INSTANCE_ID"
