@@ -41,4 +41,4 @@ jobs:
         context: .
         file: ./Dockerfile 
         push: true
-        tags: nesnukurian/scale-spring-app:latest
+        tags: nesnukurian/scale-spring-app-new:latest
