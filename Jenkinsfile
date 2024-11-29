@@ -5,9 +5,20 @@ pipeline {
         AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY')
         AWS_REGION = 'ca-central-1'
+        SONARQUBE_URL = 'http://15.223.67.216:9000'
+        SONARQUBE_TOKEN = credentials('SONAR_TOKEN')
+        NEXUS_URL = 'http://3.96.217.72:8082'  // Replace with your Nexus URL
+        NEXUS_REPO = 'maven-nexus-repo'            // Replace with your Nexus repository ID
+        NEXUS_USERNAME = credentials('NEXUS-USER') // Nexus username credentials ID
+        NEXUS_PASSWORD = credentials('NEXUS-PASSWORD') 
     }
 
     stages {
+        stage("Git Clone"){
+            steps{
+                git branch: 'main', url: 'https://github.com/NesnuKurian/scale-spring-app.git'
+            }
+        }
         // Stage 1: Pull Docker Image from Docker Hub
         stage('Pull Docker Image') {
             steps {
@@ -40,7 +51,6 @@ pipeline {
         stage('Launch EC2 Instance') {
             steps {
                 script {
-                    
                     sh '''
                     # Launch EC2 instance using AWS CLI
                     INSTANCE_ID=$(aws ec2 run-instances \
@@ -102,5 +112,41 @@ pipeline {
                 }
             }
         }
+        // **New SonarQube Stage**
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('SonarQube') {  // 'SonarQube' is the name of your SonarQube server in Jenkins
+                        // If this is a Maven project:
+                        sh 'mvn sonar:sonar -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.login=${SONARQUBE_TOKEN}'
+                        
+                                                    }
+                        }
+                 }
+            }
+            
+        // Stage 7: Publish to Nexus
+        stage('Publish to Nexus') {
+            steps {
+                script {
+                    withMaven(globalMavenSettingsConfig: 'global-settings', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                        try {
+                            dir("${env.WORKSPACE}") {  // Ensure correct directory context
+                                sh '''
+                                mvn deploy -DaltDeploymentRepository=nexus::default::${NEXUS_URL}/repository/${NEXUS_REPO} \
+                                           -Dusername=${NEXUS_USERNAME} -Dpassword=${NEXUS_PASSWORD}
+                                '''
+                            }
+                        } catch (Exception e) {
+                            error "Failed to publish to Nexus: ${e.message}"
+                        }
+                    }
+                }
+            }
+        }
+        
+
+
     }
 }
+
